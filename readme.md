@@ -39,7 +39,7 @@ La implementación puede ser tan simple como desees, pero tendrás puntos a favo
 
 1. [Instalar docker](https://docs.docker.com/install/)
 2. Instalar dependencias (desde la raiz del proyecto):
-    - `docker-compose run api pip install -r requirement.txt`
+    - `docker-compose run api pip install -r requirements.txt`
     - `docker-compose run spa npm install`
 3. Migraciones
     - `docker-compose run api python manage.py migrate`
