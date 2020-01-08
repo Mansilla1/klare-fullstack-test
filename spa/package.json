@@ -142,6 +142,10 @@
   "babel": {
     "presets": [
       "react-app"
+    ],
+    "plugins": [
+      "react-hot-loader/babel",
+      ["import", {"libraryName": "antd", "style": true}]
     ]
   }
 }
