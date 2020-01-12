@@ -1,4 +1,4 @@
-const baseUrl = 'localhost:8000'
+const baseUrl = 'http://localhost:8000'
 
 Object.defineProperty(exports, '__esModule', { value: true })
 

@@ -14,7 +14,6 @@ export const showTicketsList = ticketsList => ({
 })
 
 export const getTicketList = () => (dispatch) => {
-  debugger
   dispatch(ticketsApi.actions.tickets())
     .then(response => dispatch(showTicketsList(response.data)))
     .catch(() => {
