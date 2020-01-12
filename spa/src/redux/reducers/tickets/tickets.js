@@ -3,6 +3,8 @@ import { types } from '/spa/src/redux/actions/tickets/tickets'
 
 const initialState = {
   ticketsList: [],
+  updateTicket: {},
+  addTicket: {},
 }
 
 const tickets = (state = initialState, action) => {
@@ -17,14 +19,14 @@ const tickets = (state = initialState, action) => {
   case types.updateTicket: {
     return {
       ...state,
-      response: action.payload.response,
+      updateTicket: action.payload.response,
     }
   }
 
   case types.addTicket: {
     return {
       ...state,
-      response: action.payload.response,
+      addTicket: action.payload.response,
     }
   }
 

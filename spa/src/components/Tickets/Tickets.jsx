@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
   Button,
+  Modal,
   Popover,
   Row,
   Table,
@@ -16,6 +17,7 @@ import DetailInfo from './DetailInfo'
 
 
 const ButtonGroup = Button.Group
+const { confirm } = Modal
 
 
 class Tickets extends React.Component {
@@ -123,6 +125,18 @@ class Tickets extends React.Component {
     this.setState({ displayModal: false, record: null })
   }
 
+  handleDelete = record => () => {
+    confirm({
+      title: '¿Está seguro que desea eliminar el registro?',
+      onOk: () => {
+        console.log(`delete ${record.id}`)
+      },
+      onCancel() { },
+      cancelText: 'Cancelar',
+      okType: 'danger',
+    })
+  }
+
   renderActions = record => (
     <ButtonGroup>
       <Popover content="Detalles">
@@ -143,6 +157,7 @@ class Tickets extends React.Component {
         <Button
           type="danger"
           icon="delete"
+          onClick={this.handleDelete(record)}
         />
       </Popover>
     </ButtonGroup>
