@@ -22,7 +22,7 @@ export default reduxApi({
     },
   },
   detail: {
-    url: 'api/v1/tickets/ticketId/',
+    url: 'api/v1/tickets/:ticketId/',
     transformer: t.object,
     options: getOptions(),
     helpers: {

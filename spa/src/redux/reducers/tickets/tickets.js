@@ -3,8 +3,6 @@ import { types } from '/spa/src/redux/actions/tickets/tickets'
 
 const initialState = {
   ticketsList: [],
-  updateTicket: {},
-  addTicket: {},
 }
 
 const tickets = (state = initialState, action) => {
@@ -19,14 +17,33 @@ const tickets = (state = initialState, action) => {
   case types.updateTicket: {
     return {
       ...state,
-      updateTicket: action.payload.response,
+      ticketsList: state.ticketsList.map(data => (
+        data.id !== action.payload.response.id ? { ...data } : { ...data, ...action.payload.response }
+      )),
     }
   }
 
   case types.addTicket: {
     return {
       ...state,
-      addTicket: action.payload.response,
+      ticketsList: [
+        ...state.ticketsList,
+        action.payload.response,
+      ],
+    }
+  }
+
+  case types.removeticket: {
+    const removeTicket = action.payload.response
+    const finalResult = []
+    state.ticketsList.forEach(data => {
+      if (removeTicket.id !== data.id) {
+        finalResult.push(data)
+      }
+    })
+    return {
+      ...state,
+      ticketsList: finalResult,
     }
   }
 

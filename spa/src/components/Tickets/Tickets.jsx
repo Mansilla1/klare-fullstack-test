@@ -10,7 +10,10 @@ import {
 } from 'antd'
 
 
-import { getTicketList } from '/spa/src/redux/actions/tickets/tickets'
+import {
+  getTicketList,
+  removeData,
+} from '/spa/src/redux/actions/tickets/tickets'
 import { getStatusList } from '/spa/src/redux/actions/status/status'
 
 import DetailInfo from './DetailInfo'
@@ -25,6 +28,7 @@ class Tickets extends React.Component {
   static props = {
     getStatusList: PropTypes.func.isRequired,
     getTicketList: PropTypes.func.isRequired,
+    removeData: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
     statusList: PropTypes.arrayOf(PropTypes.shape()),
     ticketList: PropTypes.arrayOf(PropTypes.shape()),
@@ -129,7 +133,7 @@ class Tickets extends React.Component {
     confirm({
       title: '¿Está seguro que desea eliminar el registro?',
       onOk: () => {
-        console.log(`delete ${record.id}`)
+        this.props.removeData(record.id)
       },
       onCancel() { },
       cancelText: 'Cancelar',
@@ -219,6 +223,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   getStatusList,
   getTicketList,
+  removeData,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tickets)

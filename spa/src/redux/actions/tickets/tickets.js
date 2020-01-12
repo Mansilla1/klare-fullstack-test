@@ -6,6 +6,7 @@ export const types = {
   showTicketsList: 'SHOW_TICKETS_LIST',
   updateTicket: 'UPDATE_TICKET',
   addTicket: 'ADD_TICKET',
+  removeTicket: 'REMOVE_TICKET',
 }
 
 export const showTicketsList = ticketsList => ({
@@ -29,6 +30,13 @@ export const addTicket = response => ({
   },
 })
 
+export const removeTicket = response => ({
+  type: types.removeTicket,
+  payload: {
+    response,
+  },
+})
+
 export const getTicketList = () => dispatch => {
   dispatch(ticketsApi.actions.tickets())
     .then(response => dispatch(showTicketsList(response.data)))
@@ -45,11 +53,11 @@ export const saveData = payload => dispatch => {
     if (payload.id) {
       dispatch(ticketsApi.actions.detail.patch(payload.id, payload))
         .then((response) => {
-          dispatch(updateTicket(response))
+          dispatch(updateTicket(response.data))
           notification.success({
             message: `Ticket ${payload.id} actualizado con éxito`,
           })
-          resolve(response)
+          resolve(response.data)
         })
         .catch((error) => {
           notification.error({
@@ -60,11 +68,11 @@ export const saveData = payload => dispatch => {
     } else {
       dispatch(ticketsApi.actions.create.post(payload))
         .then((response) => {
-          dispatch(addTicket(response))
+          dispatch(addTicket(response.data))
           notification.success({
             message: 'Tarjeta creada con éxito',
           })
-          resolve(response)
+          resolve(response.data)
         })
         .catch((error) => {
           notification.error({
@@ -74,4 +82,19 @@ export const saveData = payload => dispatch => {
         })
     }
   })
+}
+
+export const removeData = id => dispatch => {
+  dispatch(ticketsApi.actions.detail.delete(id))
+    .then((response) => {
+      dispatch(removeTicket(response.data))
+      notification.success({
+        message: `Ticket ${id} eliminado correctamente`,
+      })
+    })
+    .catch(() => {
+      notification.error({
+        message: `Falló la eliminación de ticket (id: ${id})`,
+      })
+    })
 }
