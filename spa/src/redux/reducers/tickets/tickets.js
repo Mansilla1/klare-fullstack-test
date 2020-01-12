@@ -14,6 +14,20 @@ const tickets = (state = initialState, action) => {
     }
   }
 
+  case types.updateTicket: {
+    return {
+      ...state,
+      response: action.payload.response,
+    }
+  }
+
+  case types.addTicket: {
+    return {
+      ...state,
+      response: action.payload.response,
+    }
+  }
+
   default:
     return state
   }

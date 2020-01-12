@@ -31,10 +31,12 @@ export default reduxApi({
           ticketId,
         }, {}]
       },
-      patch(ticketId) {
+      patch(ticketId, payload) {
         return [{
           ticketId,
-        }, {}]
+        }, {
+          body: JSON.stringify(payload),
+        }]
       },
       delete(ticketId) {
         return [{

@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import {
   Col,
   Form,
@@ -11,19 +12,23 @@ import {
   Tooltip,
 } from 'antd'
 
+import { saveData } from '/spa/src/redux/actions/tickets/tickets'
+
 
 const { Option } = Select
 const { Item } = Form
 const { TextArea } = Input
 
 
-class DetailInfo extends React.Component {
+class DetailInfoData extends React.Component {
   static props = {
     record: PropTypes.object,
     visible: PropTypes.bool,
     edit: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     statusList: PropTypes.arrayOf(PropTypes.shape()),
+    form: PropTypes.shape(),
+    saveData: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -31,10 +36,31 @@ class DetailInfo extends React.Component {
     visible: false,
     edit: false,
     statusList: [],
+    form: null,
+  }
+
+  state = {
+    isLoading: false,
   }
 
   handleSubmit = () => {
-    debugger
+    const {
+      edit,
+      form,
+      record,
+    } = this.props
+    this.setState({
+      isLoading: true,
+    })
+    this.props.saveData({
+      id: edit ? record.id : null,
+      title: form.getFieldValue('title'),
+      status: form.getFieldValue('status'),
+      description: form.getFieldValue('description'),
+    })
+      .finally(() => {
+        this.setState({ isLoading: false })
+      })
   }
 
   drawModalContent = (typeOfAction, record) => {
@@ -75,31 +101,44 @@ class DetailInfo extends React.Component {
     </div>
   )
 
-  drawFormData = (record, edit = false) => (
-    <Form onSubmit={this.handleSubmit} labelCol={{ span: 6 }} wrapperCol={{ span: 14 }}>
-      <Item label="Título">
-        <Input
-          placeholder="Título"
-          value={edit ? record.title : ''}
-        />
-      </Item>
-      <Item label="Estado">
-        <Select
-          placeholder="Estado"
-          defaultValue={edit ? record.status : 1 }
-        >
-          {this.props.statusList.map(status => (
-            <Option value={status.id}>{status.display_name}</Option>
-          ))}
-        </Select>
-      </Item>
-      <Item label="Descripción">
-        <TextArea
-          rows={4}
-        />
-      </Item>
-    </Form>
-  )
+  drawFormData = (record, edit = false) => {
+    const { getFieldDecorator } = this.props.form
+    return (
+      <Form labelCol={{ span: 6 }} wrapperCol={{ span: 14 }}>
+        <Item label="Título">
+          {getFieldDecorator('title',
+            {
+              initialValue: edit ? record.title : '',
+            })(
+              <Input placeholder="Título" />
+            )
+          }
+        </Item>
+        <Item label="Estado">
+          {getFieldDecorator('state',
+            {
+              initialValue: edit ? record.status : 1
+            })(
+              <Select placeholder="Estado" >
+                {this.props.statusList.map(status => (
+                  <Option value={status.id}>{status.display_name}</Option>
+                ))}
+              </Select>
+            )
+          }
+        </Item>
+        <Item label="Descripción">
+          {getFieldDecorator('description',
+          {})(
+            <TextArea
+              rows={4}
+            />
+          )
+          }
+        </Item>
+      </Form>
+    )
+  }
 
   render() {
     const {
@@ -124,7 +163,8 @@ class DetailInfo extends React.Component {
         visible={visible}
         onCancel={onClose}
         title={title}
-        onOk={typeOfAction === 'detail' ? onClose : this.submitButton}
+        onOk={typeOfAction === 'detail' ? onClose : this.handleSubmit}
+        confirmLoading={this.state.isLoading}
         destroyOnClose
       >
         {visible &&
@@ -133,7 +173,12 @@ class DetailInfo extends React.Component {
       </Modal>
     )
   }
-
 }
 
-export default DetailInfo
+const DetailInfo = Form.create()(DetailInfoData)
+
+const mapDispatchToProps = {
+  saveData,
+}
+
+export default connect(null, mapDispatchToProps)(DetailInfo)
