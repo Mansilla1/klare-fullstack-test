@@ -30,10 +30,10 @@ export const addTicket = response => ({
   },
 })
 
-export const removeTicket = response => ({
+export const removeTicket = id => ({
   type: types.removeTicket,
   payload: {
-    response,
+    id,
   },
 })
 
@@ -49,45 +49,39 @@ export const getTicketList = () => dispatch => {
 }
 
 export const saveData = payload => dispatch => {
-  new Promise((resolve, reject) => {
-    if (payload.id) {
-      dispatch(ticketsApi.actions.detail.patch(payload.id, payload))
-        .then((response) => {
-          dispatch(updateTicket(response.data))
-          notification.success({
-            message: `Ticket ${payload.id} actualizado con éxito`,
-          })
-          resolve(response.data)
+  if (payload.id) {
+    dispatch(ticketsApi.actions.patch.patch(payload.id, payload))
+      .then((response) => {
+        dispatch(updateTicket(response))
+        notification.success({
+          message: `Ticket ${payload.id} actualizado con éxito`,
         })
-        .catch((error) => {
-          notification.error({
-            message: `Ticket ${payload.id} no se puede actualizar`,
-          })
-          reject(error)
+      })
+      .catch(() => {
+        notification.error({
+          message: `Ticket ${payload.id} no se puede actualizar`,
         })
-    } else {
-      dispatch(ticketsApi.actions.create.post(payload))
-        .then((response) => {
-          dispatch(addTicket(response.data))
-          notification.success({
-            message: 'Tarjeta creada con éxito',
-          })
-          resolve(response.data)
+      })
+  } else {
+    dispatch(ticketsApi.actions.create.post(payload))
+      .then((response) => {
+        dispatch(addTicket(response))
+        notification.success({
+          message: 'Tarjeta creada con éxito',
         })
-        .catch((error) => {
-          notification.error({
-            message: 'No se puede crear la tarjeta',
-          })
-          reject(error)
+      })
+      .catch(() => {
+        notification.error({
+          message: 'No se puede crear la tarjeta',
         })
-    }
-  })
+      })
+  }
 }
 
 export const removeData = id => dispatch => {
-  dispatch(ticketsApi.actions.detail.delete(id))
-    .then((response) => {
-      dispatch(removeTicket(response.data))
+  dispatch(ticketsApi.actions.remove.delete(id))
+    .then(() => {
+      dispatch(removeTicket(id))
       notification.success({
         message: `Ticket ${id} eliminado correctamente`,
       })

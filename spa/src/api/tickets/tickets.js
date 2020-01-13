@@ -24,13 +24,20 @@ export default reduxApi({
   detail: {
     url: 'api/v1/tickets/:ticketId/',
     transformer: t.object,
-    options: getOptions(),
+    options: getOptions('GET'),
     helpers: {
       get(ticketId) {
         return [{
           ticketId,
         }, {}]
       },
+    },
+  },
+  patch: {
+    url: 'api/v1/tickets/:ticketId/',
+    transformer: t.object,
+    options: getOptions('PATCH'),
+    helpers: {
       patch(ticketId, payload) {
         return [{
           ticketId,
@@ -45,5 +52,17 @@ export default reduxApi({
       },
     },
   },
+  remove: {
+    url: 'api/v1/tickets/:ticketId/',
+    transformer: t.object,
+    options: getOptions('DELETE'),
+    helpers: {
+      delete(ticketId) {
+        return [{
+          ticketId,
+        }, {}]
+      },
+    }
+  }
 })
   .use('fetch', adapterFetch(fetch))

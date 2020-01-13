@@ -29,6 +29,7 @@ class DetailInfoData extends React.Component {
     statusList: PropTypes.arrayOf(PropTypes.shape()),
     form: PropTypes.shape(),
     saveData: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -37,9 +38,6 @@ class DetailInfoData extends React.Component {
     edit: false,
     statusList: [],
     form: null,
-  }
-
-  state = {
     isLoading: false,
   }
 
@@ -49,18 +47,13 @@ class DetailInfoData extends React.Component {
       form,
       record,
     } = this.props
-    this.setState({
-      isLoading: true,
-    })
     this.props.saveData({
       id: edit ? record.id : null,
       title: form.getFieldValue('title'),
       status: form.getFieldValue('status'),
       description: form.getFieldValue('description'),
     })
-      .finally(() => {
-        this.setState({ isLoading: false })
-      })
+    this.props.onClose()
   }
 
   drawModalContent = (typeOfAction, record) => {
@@ -75,7 +68,7 @@ class DetailInfoData extends React.Component {
       <Row>
         <Col span={12}>
           <Tag color="magenta">
-            {record.statusInfo.display_name}
+            {record.statusDisplay}
           </Tag>
         </Col>
         <Col span={12}>
@@ -115,9 +108,9 @@ class DetailInfoData extends React.Component {
           }
         </Item>
         <Item label="Estado">
-          {getFieldDecorator('state',
+          {getFieldDecorator('status',
             {
-              initialValue: edit ? record.status : 1
+              initialValue: edit ? record.status : 1,
             })(
               <Select placeholder="Estado" >
                 {this.props.statusList.map(status => (
@@ -129,7 +122,9 @@ class DetailInfoData extends React.Component {
         </Item>
         <Item label="Descripción">
           {getFieldDecorator('description',
-          {})(
+          {
+            initialValue: edit ? record.description : '',
+          })(
             <TextArea
               rows={4}
             />
@@ -146,6 +141,7 @@ class DetailInfoData extends React.Component {
       visible,
       edit,
       onClose,
+      isLoading,
     } = this.props
 
     let title = 'Nuevo ticket'
@@ -164,7 +160,7 @@ class DetailInfoData extends React.Component {
         onCancel={onClose}
         title={title}
         onOk={typeOfAction === 'detail' ? onClose : this.handleSubmit}
-        confirmLoading={this.state.isLoading}
+        confirmLoading={isLoading}
         destroyOnClose
       >
         {visible &&
@@ -177,8 +173,12 @@ class DetailInfoData extends React.Component {
 
 const DetailInfo = Form.create()(DetailInfoData)
 
+const mapStateToProps = state => ({
+  isLoading: state.api.tickets.create.loading,
+})
+
 const mapDispatchToProps = {
   saveData,
 }
 
-export default connect(null, mapDispatchToProps)(DetailInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(DetailInfo)

@@ -34,10 +34,10 @@ const tickets = (state = initialState, action) => {
   }
 
   case types.removeticket: {
-    const removeTicket = action.payload.response
+    const removeTicket = action.payload.id
     const finalResult = []
     state.ticketsList.forEach(data => {
-      if (removeTicket.id !== data.id) {
+      if (removeTicket !== data.id) {
         finalResult.push(data)
       }
     })

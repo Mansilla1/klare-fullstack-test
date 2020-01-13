@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
   Button,
+  Col,
+  Input,
   Modal,
   Popover,
   Row,
@@ -21,6 +23,7 @@ import DetailInfo from './DetailInfo'
 
 const ButtonGroup = Button.Group
 const { confirm } = Modal
+const { Search } = Input
 
 
 class Tickets extends React.Component {
@@ -36,57 +39,33 @@ class Tickets extends React.Component {
 
   static defaultProps = {
     isLoading: false,
-    // statusList: [],
-    // ticketList: [],
-    statusList : [
-      {
-          "id": 1,
-          "status": "pending",
-          "display_name": "Pendiente"
-      },
-      {
-          "id": 2,
-          "status": "completed",
-          "display_name": "Completado"
-      }
-    ],
-    ticketList: [
-      {
-          "id": 4,
-          "title": "testing",
-          "description": null,
-          "created_at": "2020-01-05T23:03:52.747972Z",
-          "updated_at": "2020-01-05T23:03:52.748015Z",
-          "status": 1
-      },
-      {
-          "id": 5,
-          "title": "testing2",
-          "description": null,
-          "created_at": "2020-01-05T23:06:06.766798Z",
-          "updated_at": "2020-01-05T23:06:06.766842Z",
-          "status": 1
-      },
-      {
-          "id": 6,
-          "title": "testing3",
-          "description": "sfkajsdfkajskfasd",
-          "created_at": "2020-01-05T23:06:27.277582Z",
-          "updated_at": "2020-01-06T00:56:18.724850Z",
-          "status": 2
-      }
-    ],
+    statusList: [],
+    ticketList: [],
   }
 
   state = {
     displayModal: false,
     edit: false,
     record: null,
+    searchInput: '',
   }
 
   componentWillMount() {
     this.props.getStatusList()
     this.props.getTicketList()
+  }
+
+  handleSearchInputChange = value => this.setState({ searchInput: value.target.value })
+
+  getFilteredResult = (dataResult, searchValues) => {
+    const search = searchValues.toLowerCase()
+    const filteredResult = dataResult.filter(summary => (
+      Object.values(summary).some(value => (
+        `${value}`.toLowerCase().includes(search)
+      ))
+    ))
+
+    return filteredResult
   }
 
   columns = [
@@ -103,8 +82,12 @@ class Tickets extends React.Component {
     {
       title: 'Estado',
       rowKey: 'status',
-      dataIndex: 'statusInfo',
-      render: (text, record ) => record.statusInfo.display_name || '-',
+      dataIndex: 'statusDisplay',
+      filters: [
+        { text: 'Pendiente', value: 'Pendiente' },
+        { text: 'Completado', value: 'Completado' },
+      ],
+      onFilter: (value, record) => `${record.statusDisplay}` === value,
     },
     {
       title: 'Acciones',
@@ -115,7 +98,7 @@ class Tickets extends React.Component {
 
   getMatchedResult = (ticketList, statusList) => ticketList.map(ticket => ({
     ...ticket,
-    statusInfo: statusList.find(stats => stats.id === ticket.status) || {},
+    statusDisplay: (statusList.find(stats => stats.id === ticket.status) || {}).display_name,
   }))
 
   openModal = (values) => () => {
@@ -178,25 +161,37 @@ class Tickets extends React.Component {
       displayModal,
       edit,
       record,
+      searchInput,
     } = this.state
 
     const matchedResult = this.getMatchedResult(ticketList, statusList)
+    const filteredResult = this.getFilteredResult(matchedResult, searchInput)
 
     return (
       <div>
         <Row>
-          <Button
-            icon="plus-circle"
-            type="primary"
-            onClick={this.openModal({ edit: false, record: null })}
-          >
-            Nueva tarea
-          </Button>
+          <Col span={8}>
+            <Button
+              icon="plus-circle"
+              type="primary"
+              onClick={this.openModal({ edit: false, record: null })}
+            >
+              Nueva tarea
+            </Button>
+          </Col>
+          <Col span={6} offset={10}>
+            <Search
+              placeholder="Buscar..."
+              onChange={this.handleSearchInputChange}
+              enterButton
+              allowClear
+            />
+          </Col>
         </Row>
         <Row>
           <Table
             columns={this.columns}
-            dataSource={matchedResult}
+            dataSource={filteredResult}
             loading={isLoading}
             rowKey="id"
           />
@@ -216,8 +211,8 @@ class Tickets extends React.Component {
 
 const mapStateToProps = state => ({
   isLoading: state.api.tickets.tickets.loading,
-  // statusList: state.status.statusList,
-  // ticketList: state.tickets.ticketsList,
+  statusList: state.status.statusList,
+  ticketList: state.tickets.ticketsList,
 })
 
 const mapDispatchToProps = {
