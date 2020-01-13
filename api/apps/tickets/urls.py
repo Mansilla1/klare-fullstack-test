@@ -5,7 +5,7 @@ from apps.tickets import views
 
 app_name = 'tickets'
 
-urlpatterns = {
+urlpatterns = [
     path(
         'status/',
         views.StatusList.as_view(),
@@ -21,4 +21,4 @@ urlpatterns = {
         views.TicketsDetails.as_view(),
         name='tickets-detail',
     ),
-}
+]
