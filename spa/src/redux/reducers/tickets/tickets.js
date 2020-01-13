@@ -33,7 +33,7 @@ const tickets = (state = initialState, action) => {
     }
   }
 
-  case types.removeticket: {
+  case types.removeTicket: {
     const removeTicket = action.payload.id
     const finalResult = []
     state.ticketsList.forEach(data => {
